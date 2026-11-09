@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090812">
+<title>ScreenLive — обмен экраном</title>
+<style>
+:root{color-scheme:dark;--bg:#090812;--panel:#171525;--line:#302b45;--muted:#aaa5bd;--violet:#9870ff;--pink:#d95be8;--green:#49dda4}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -15%,#39245d 0,transparent 48%),var(--bg);color:#f8f6ff;font:16px/1.5 Inter,system-ui,Segoe UI,Arial,sans-serif}main{width:min(960px,100%);margin:auto;padding:24px 16px 42px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px}.brand{font-size:25px;font-weight:900;letter-spacing:-1px}.brand span{color:#bea6ff}.pill{font-size:11px;letter-spacing:.08em;color:#d4c6ff;border:1px solid #5c4783;background:#211832;border-radius:99px;padding:7px 11px}.hero{text-align:center;margin-bottom:24px}.eyebrow{color:#c1a9ff;font-size:12px;font-weight:800;letter-spacing:.13em}.hero h1{font-size:clamp(32px,7vw,49px);line-height:1.07;letter-spacing:-2px;margin:12px 0}.hero h1 span{color:#b99aff}.hero p{color:var(--muted);margin:0 auto;max-width:610px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px}.panel{background:linear-gradient(145deg,#1b192a,#11111b);border:1px solid var(--line);border-radius:23px;padding:21px;box-shadow:0 22px 70px #0005}.panel h2{font-size:19px;margin:7px 0}.panel p{color:var(--muted);font-size:14px;margin:6px 0}.tag{display:inline-block;font-size:11px;color:#d8caff;background:#2b2140;border:1px solid #554071;border-radius:99px;padding:5px 9px}.qrbox{width:250px;max-width:100%;height:250px;margin:17px auto 13px;background:white;border-radius:17px;padding:9px;display:flex;align-items:center;justify-content:center}.qrbox img,.qrbox canvas{max-width:100%;height:auto!important}.qrwait{color:#332d45;text-align:center;font-size:13px}.btn{border:0;border-radius:13px;padding:12px 18px;background:linear-gradient(110deg,var(--violet),var(--pink));color:white;font-weight:800;cursor:pointer}.btn.secondary{background:#29263c;border:1px solid #49435f}.btn:disabled{opacity:.5;cursor:not-allowed}.actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:14px}.status{display:flex;justify-content:center;align-items:center;gap:8px;margin:14px 0 0;color:#d0ccdf;font-size:13px}.dot{width:9px;height:9px;border-radius:50%;background:#858398;flex:none}.dot.on{background:var(--green);box-shadow:0 0 12px #42d69a}.video{width:100%;max-height:65vh;aspect-ratio:16/9;object-fit:contain;background:#030307;border:1px solid var(--line);border-radius:16px;margin-top:16px}.hidden{display:none!important}.note{margin:20px auto 0;background:#211a30;border-left:3px solid var(--violet);border-radius:9px;padding:12px 14px;color:#d9cff2;font-size:13px;max-width:760px}.note.warn{border-left-color:#ffb020;background:#2d2415}.foot{text-align:center;color:#747188;font-size:12px;margin-top:25px}.phonepanel{max-width:650px;margin:auto}.device{display:inline-block;border:1px solid #3b3650;background:#211d31;border-radius:99px;padding:7px 12px;color:#d9d0f3;font-size:12px;margin:10px 0}.placeholder{display:flex;min-height:210px;aspect-ratio:16/9;align-items:center;justify-content:center;flex-direction:column;gap:9px;background:#08070e;border:1px dashed #4b4267;border-radius:16px;margin-top:16px;color:#aaa5bd;padding:18px;text-align:center}.placeholder b{color:#f4f0ff}.small{font-size:12px;color:#aaa5bd;word-break:break-all;text-align:center;margin-top:12px}
+@media(max-width:650px){main{padding:17px 12px 30px}.grid{grid-template-columns:1fr}.panel{padding:17px}.qrbox{width:235px;height:235px}.top{margin-bottom:23px}.brand{font-size:22px}}
+</style>
+</head>
+<body><main>
+<header class="top"><div class="brand">◈ Screen<span>Live</span></div><div class="pill">LIVE SCREEN</div></header>
+
+<section id="laptop" class="hidden">
+ <div class="hero"><div class="eyebrow">ДВА СПОСОБА ПОДКЛЮЧЕНИЯ</div><h1>Выбери направление<br><span>трансляции экрана</span></h1><p>Отсканируй нужный QR-код телефоном. Оба устройства должны открыть этот сайт по HTTPS.</p></div>
+ <div id="fileWarn" class="note warn hidden">⚠️ Страница открыта как локальный файл. QR будет создан, но телефон не сможет его открыть. Загрузи сайт на HTTPS-хостинг (Netlify, GitHub Pages, Vercel) и открой по ссылке.</div>
+ <div class="grid">
+  <article class="panel">
+   <span class="tag">ТЕЛЕФОН → НОУТБУК</span>
+   <h2>Показать экран телефона</h2>
+   <p>Отсканируй этот код телефоном. На телефоне нажми «Начать показ» и подтверди системный запрос.</p>
+   <div class="qrbox" id="qrPhone"><div class="qrwait">Создаём QR…</div></div>
+   <div class="status"><span class="dot" id="phoneToPcDot"></span><span id="phoneToPcStatus">Создаём комнату…</span></div>
+   <video id="phoneToPcVideo" class="video hidden" autoplay playsinline controls></video>
+  </article>
+  <article class="panel">
+   <span class="tag">НОУТБУК → ТЕЛЕФОН</span>
+   <h2>Показать экран ноутбука</h2>
+   <p>Отсканируй этот код телефоном. На ноутбуке нажми кнопку ниже и выбери экран.</p>
+   <div class="qrbox" id="qrPc"><div class="qrwait">Создаём QR…</div></div>
+   <div class="actions"><button class="btn" id="startPc" disabled>Начать показ экрана</button><button class="btn secondary hidden" id="stopPc">Остановить</button></div>
+   <div class="status"><span class="dot" id="pcToPhoneDot"></span><span id="pcToPhoneStatus">Создаём комнату…</span></div>
+   <video id="pcPreview" class="video hidden" autoplay muted playsinline></video>
+  </article>
+ </div>
+ <div class="actions"><button class="btn secondary hidden" id="retryBtn">↻ Повторить подключение к серверу</button></div>
+ <div class="note">Показ экрана запускается только после разрешения владельца устройства. Для телефона функция захвата экрана зависит от браузера и ОС: не все мобильные браузеры её поддерживают. Если соединение через разные сети не проходит, понадобится TURN-сервер.</div>
+ <div class="small" id="roomInfo"></div>
+</section>
+
+<section id="phoneView" class="hidden">
+ <div class="hero"><div class="eyebrow">SCREENLIVE · ПОДКЛЮЧЕНИЕ</div><h1 id="phoneHeading">Подключение</h1><p id="phoneDescription">Подготавливаем соединение с ноутбуком.</p></div>
+ <div class="panel phonepanel" style="text-align:center">
+  <div class="device" id="phoneModeLabel">📱 Устройство · ScreenLive</div>
+  <div class="status"><span class="dot" id="phoneDot"></span><span id="phoneStatus">Подключаемся…</span></div>
+  <div id="phonePlaceholder" class="placeholder"><div style="font-size:38px">▣</div><b>Ожидаем трансляцию</b><span>Оставь эту страницу открытой</span></div>
+  <video id="phoneVideo" class="video hidden" autoplay playsinline controls></video>
+  <div class="actions" id="phoneActions"></div>
+  <div class="note" id="phoneNote">Не закрывай эту страницу во время подключения.</div>
+ </div>
+</section>
+<section id="bad" class="hidden"><div class="hero"><h1>ScreenLive</h1><p id="badText"></p></div></section>
+<div class="foot">ScreenLive · Два направления трансляции</div>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id);
+let peer=null,roomId='',pcStream=null,phoneStream=null,pendingPcCall=null,pcViewerCall=null,phoneSenderCall=null,phoneViewerCall=null;
+const rtc={iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]};
+const mobile=()=>/Android|iPhone|iPod|Mobile|iPad/i.test(navigator.userAgent);
+const secure=()=>window.isSecureContext||location.hostname==='localhost';
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function show(id){['laptop','phoneView','bad'].forEach(x=>$(x).classList.toggle('hidden',x!==id))}
+function status(id,msg,on=false){$(id).textContent=msg;const dotId={phoneToPcStatus:'phoneToPcDot',pcToPhoneStatus:'pcToPhoneDot',phoneStatus:'phoneDot'}[id];if(dotId)$(dotId).classList.toggle('on',on)}
+
+/* ---------- загрузка библиотек с запасными источниками ---------- */
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(Error('load '+src));document.head.appendChild(s);});}
+async function ensureLibs(){
+  if(!window.QRCode){for(const u of ['https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js','https://unpkg.com/qrcodejs@1.0.0/qrcode.min.js']){try{await loadScript(u);if(window.QRCode)break;}catch(e){}}}
+  if(!window.Peer){for(const u of ['https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js','https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js']){try{await loadScript(u);if(window.Peer)break;}catch(e){}}}
+}
+
+/* ---------- QR: не зависит от сервера соединения ---------- */
+function makeQr(target,url){
+  const box=$(target);box.innerHTML='';
+  if(window.QRCode){
+    try{new QRCode(box,{text:url,width:225,height:225,colorDark:'#111111',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.L});return;}catch(e){box.innerHTML='';}
+  }
+  // запасной вариант: картинка с публичного генератора QR
+  const img=new Image();img.width=225;img.height=225;img.alt='QR';
+  img.src='https://api.qrserver.com/v1/create-qr-code/?size=450x450&margin=0&data='+encodeURIComponent(url);
+  img.onerror=()=>{box.innerHTML='<div class="qrwait">Не удалось создать QR.<br>Ссылка ниже ↓</div>';};
+  box.appendChild(img);
+}
+
+/* ---------- Peer с повторными попытками ---------- */
+function createPeer(id){return new Promise((resolve,reject)=>{
+  if(!window.Peer)return reject(Error('Не загрузился PeerJS. Проверь интернет.'));
+  const opts={host:'0.peerjs.com',port:443,path:'/',secure:true,debug:0,config:rtc};
+  const p=id?new Peer(id,opts):new Peer(opts);
+  const timer=setTimeout(()=>{p.destroy();reject(Error('Сервер соединения не ответил.'));},12000);
+  p.once('open',()=>{clearTimeout(timer);resolve(p)});
+  p.once('error',e=>{clearTimeout(timer);try{p.destroy()}catch(_){}reject(e)});
+});}
+async function createPeerRetry(id,statusIds){
+  let last;
+  for(let i=1;i<=4;i++){
+    statusIds.forEach(s=>status(s,'Подключаемся к серверу… попытка '+i+' из 4'));
+    try{return await createPeer(id);}catch(e){last=e;await sleep(1200);}
+  }
+  throw last||Error('Сервер недоступен');
+}
+
+function showReceivedOnLaptop(call){call.answer();call.on('stream',stream=>{$('phoneToPcVideo').srcObject=stream;$('phoneToPcVideo').classList.remove('hidden');status('phoneToPcStatus','Экран телефона передаётся LIVE',true);});call.on('close',()=>status('phoneToPcStatus','Телефон отключился. QR готов снова.'));call.on('error',e=>status('phoneToPcStatus','Ошибка: '+(e.message||'соединение')));}
+function answerLaptopShare(call){if(!pcStream){pendingPcCall=call;status('pcToPhoneStatus','Телефон подключён. Нажми «Начать показ экрана».',true);return;}pcViewerCall=call;call.answer(pcStream);status('pcToPhoneStatus','Телефон смотрит экран ноутбука LIVE',true);call.on('close',()=>{pcViewerCall=null;status('pcToPhoneStatus','Телефон отключился. QR готов снова.');});}
+async function startPcShare(){try{if(!secure())throw Error('Для показа экрана нужен HTTPS.');if(!navigator.mediaDevices?.getDisplayMedia)throw Error('Браузер не поддерживает захват экрана. Используй актуальный Chrome или Edge.');$('startPc').disabled=true;status('pcToPhoneStatus','Выбери экран ноутбука…');pcStream=await navigator.mediaDevices.getDisplayMedia({video:{frameRate:30},audio:false});$('pcPreview').srcObject=pcStream;$('pcPreview').classList.remove('hidden');$('startPc').classList.add('hidden');$('stopPc').classList.remove('hidden');status('pcToPhoneStatus','Экран готов. Ожидаем телефон…',true);if(pendingPcCall){const c=pendingPcCall;pendingPcCall=null;answerLaptopShare(c);}pcStream.getVideoTracks()[0].addEventListener('ended',stopPcShare);}catch(e){status('pcToPhoneStatus',e.message||'Не удалось включить показ.');$('startPc').disabled=false;}}
+function stopPcShare(){if(pcStream){pcStream.getTracks().forEach(t=>t.stop());pcStream=null;}if(pcViewerCall){pcViewerCall.close();pcViewerCall=null;}if(pendingPcCall){pendingPcCall.close();pendingPcCall=null;}$('pcPreview').srcObject=null;$('pcPreview').classList.add('hidden');$('startPc').classList.remove('hidden');$('startPc').disabled=false;$('stopPc').classList.add('hidden');status('pcToPhoneStatus','Показ ноутбука остановлен.');}
+
+async function connectLaptopPeer(){
+  $('retryBtn').classList.add('hidden');
+  try{
+    if(peer){try{peer.destroy()}catch(_){}peer=null;}
+    peer=await createPeerRetry(roomId,['phoneToPcStatus','pcToPhoneStatus']);
+    status('phoneToPcStatus','Готово: телефон → ноутбук',true);
+    status('pcToPhoneStatus','Готово: ноутбук → телефон',true);
+    peer.on('call',call=>{if(call.metadata?.mode==='phone-share')showReceivedOnLaptop(call);else answerLaptopShare(call);});
+    peer.on('error',e=>{const m='Ошибка комнаты: '+(e.type||e.message||'ошибка');status('phoneToPcStatus',m);status('pcToPhoneStatus',m);});
+    peer.on('disconnected',()=>{try{peer.reconnect()}catch(_){}});
+    $('startPc').disabled=false;
+  }catch(e){
+    const m='Сервер соединения недоступен. Проверь интернет / отключи VPN и нажми «Повторить».';
+    status('phoneToPcStatus',m);status('pcToPhoneStatus',m);
+    $('retryBtn').classList.remove('hidden');
+  }
+}
+
+async function initLaptop(){
+  show('laptop');
+  if(location.protocol==='file:')$('fileWarn').classList.remove('hidden');
+  await ensureLibs();
+  roomId='sl-'+(crypto.randomUUID?crypto.randomUUID().replace(/-/g,''):Math.random().toString(36).slice(2)+Date.now().toString(36));
+  const base=location.href.split('#')[0];
+  // QR создаются СРАЗУ, не дожидаясь сервера
+  makeQr('qrPhone',base+'#join='+encodeURIComponent(roomId)+'&mode=phone');
+  makeQr('qrPc',base+'#join='+encodeURIComponent(roomId)+'&mode=computer');
+  $('roomInfo').textContent='Комната: '+roomId;
+  if(!secure()){status('pcToPhoneStatus','Опубликуй сайт на HTTPS-хостинге.');status('phoneToPcStatus','Для работы нужна публичная HTTPS-ссылка.');return;}
+  connectLaptopPeer();
+}
+$('retryBtn').addEventListener('click',connectLaptopPeer);
+
+function dummyStream(){const c=document.createElement('canvas');c.width=2;c.height=2;const ctx=c.getContext('2d');ctx.fillRect(0,0,2,2);return c.captureStream(1);}
+function setPhoneVideo(stream){$('phoneVideo').srcObject=stream;$('phoneVideo').classList.remove('hidden');$('phonePlaceholder').classList.add('hidden');$('phoneVideo').play().catch(()=>{});}
+async function joinPhone(id,mode){show('phoneView');if(!secure()){status('phoneStatus','Открой сайт по HTTPS.');return;}try{await ensureLibs();peer=await createPeerRetry(null,['phoneStatus']);if(mode==='computer'){ $('phoneHeading').innerHTML='Смотри экран<br><span>ноутбука на телефоне</span>' ;$('phoneDescription').textContent='Телефон подключится к ноутбуку автоматически.';$('phoneModeLabel').textContent='📱 Телефон · просмотр';const call=peer.call(id,dummyStream(),{metadata:{mode:'computer-view'}});if(!call)throw Error('Не удалось отправить запрос ноутбуку.');phoneViewerCall=call;call.on('stream',stream=>{setPhoneVideo(stream);status('phoneStatus','Подключено · экран ноутбука LIVE',true);});call.on('close',()=>{status('phoneStatus','Трансляция ноутбука завершена.');$('phoneVideo').classList.add('hidden');$('phonePlaceholder').classList.remove('hidden');});call.on('error',e=>status('phoneStatus','Ошибка: '+(e.message||'видео')));status('phoneStatus','Запрос отправлен. Включи показ экрана на ноутбуке…',true);
+}else if(mode==='phone'){ $('phoneHeading').innerHTML='Покажи экран<br><span>телефона на ноутбуке</span>';$('phoneDescription').textContent='Нажми кнопку и подтверди системный запрос на запись экрана.';$('phoneModeLabel').textContent='📱 Телефон · источник экрана';$('phoneActions').innerHTML='<button class="btn" id="startPhone">Начать показ экрана телефона</button><button class="btn secondary hidden" id="stopPhone">Остановить</button>';$('startPhone').addEventListener('click',()=>startPhoneShare(id));$('stopPhone').addEventListener('click',stopPhoneShare);status('phoneStatus','Готово. Нажми «Начать показ экрана телефона».',true);
+}else{throw Error('QR-код содержит неизвестный режим.');}}catch(e){status('phoneStatus',e.message||'Не удалось подключиться.');}}
+async function startPhoneShare(id){try{if(!navigator.mediaDevices?.getDisplayMedia)throw Error('Этот браузер не поддерживает передачу экрана телефона. Попробуй Android с актуальным Chrome. На iPhone показ экрана из браузера недоступен.');$('startPhone').disabled=true;status('phoneStatus','Подтверди запись экрана в системном окне…');phoneStream=await navigator.mediaDevices.getDisplayMedia({video:true,audio:false});phoneSenderCall=peer.call(id,phoneStream,{metadata:{mode:'phone-share'}});if(!phoneSenderCall)throw Error('Не удалось отправить экран на ноутбук.');phoneSenderCall.on('close',()=>status('phoneStatus','Соединение завершено.'));phoneSenderCall.on('error',e=>status('phoneStatus','Ошибка: '+(e.message||'передача')));$('startPhone').classList.add('hidden');$('stopPhone').classList.remove('hidden');status('phoneStatus','Экран телефона передаётся на ноутбук LIVE',true);phoneStream.getVideoTracks()[0].addEventListener('ended',stopPhoneShare);}catch(e){status('phoneStatus',e.message||'Не удалось начать показ.');if($('startPhone'))$('startPhone').disabled=false;}}
+function stopPhoneShare(){if(phoneStream){phoneStream.getTracks().forEach(t=>t.stop());phoneStream=null;}if(phoneSenderCall){phoneSenderCall.close();phoneSenderCall=null;}if($('startPhone')){$('startPhone').classList.remove('hidden');$('startPhone').disabled=false;}$('stopPhone')?.classList.add('hidden');status('phoneStatus','Показ экрана телефона остановлен.');}
+$('startPc').addEventListener('click',startPcShare);$('stopPc').addEventListener('click',stopPcShare);window.addEventListener('beforeunload',()=>{[pcStream,phoneStream].forEach(s=>s?.getTracks().forEach(t=>t.stop()));peer?.destroy();});
+function boot(){const hash=location.hash;const m=hash.match(/^#join=([^&]+)&mode=(phone|computer)$/);if(m){if(!mobile()){show('bad');$('badText').textContent='Этот QR предназначен для телефона. Открой его камерой телефона.';return;}joinPhone(decodeURIComponent(m[1]),m[2]);}else{if(mobile()){show('bad');$('badText').textContent='На телефоне можно открыть QR с ноутбука. Для создания двух QR открой ScreenLive на ноутбуке.';return;}initLaptop();}}
+boot();
+})();
+</script>
+</body></html>
